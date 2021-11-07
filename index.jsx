@@ -24,5 +24,5 @@ const styles = StyleSheet.create({
 
 
 AppRegistry.registerComponent(
-  'my-rn-app-3', () => MyApp
+  'Two-minute-app', () => MyApp
 )

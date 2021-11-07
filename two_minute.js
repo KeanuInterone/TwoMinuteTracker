@@ -4,70 +4,77 @@ import {StyleSheet, Text, View, Button} from 'react-native'
 const TwoMinute = () => {
   
   const timeLength = 120
-  var [state, setState] = useState("ready")
-  var intervalID = null
-  var [time, setTime] = useState(timeLength)
-  var [successCount, setSuccessCount] = useState(0)
-  var [failCount, setFailCount] = useState(0)
+  var [state, setState] = useState({
+    state: "ready",
+    interval: null,
+    time: timeLength,
+    successCount: 0,
+    failCount: 0
+  })
   
   
   useEffect(() => {
     console.log("component mounted")
-    
     return () => {
       console.log("component unmounted")
-      clearInterval(intervalID)
     }
   }, [])
   
   const startTimer = () => {
     console.log("starting timer")
-    intervalID = setInterval(decrementTimer, 1000)
-    setState("running")
+    state.interval = setInterval(decrementTimer, 1000)
+    state.state = "running"
+    setState({...state})
   }
   
   const decrementTimer = () => {
-    setTime(--time)
-    if (time < 0) {
-      setState("done")
-      setTime(timeLength)
-      clearInterval(intervalID)
+    state.time--
+    if (state.time < 0) {
+      state.state = "done"
+      state.time = timeLength
+      clearInterval(state.interval)
+      state.interval = null
     }
+    setState({...state})
   }
   
   const stopTimer = () => {
     console.log("stoping timmer")
-    setState("ready")
-    clearInterval(intervalID)
-    setTime(timeLength)
+    state.time = timeLength
+    state.state = "ready"
+    clearInterval(state.interval)
+    state.interval = null
+    setState({...state})
   }
   
   const markSuccessFail = (success) => {
     if (success) {
-      setSuccessCount(++successCount)
+      state.successCount++
     } else {
-      setFailCount(++failCount)
+      state.failCount++
     }
-    setState("ready")
+    state.state = "ready"
+    setState({...state})
   }
   
-  if(state === "ready") {
+ 
+  if(state.state === "ready") {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
-          Success: {successCount}   Fail: {failCount}
+          Success: {state.successCount}   Fail: {state.failCount}
         </Text>
         <Button title="Start" onPress={startTimer}/>
       </View>
     ) 
-  } else if (state === "running") {
+  } else if (state.state === "running") {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
-          Success: {successCount}   Fail: {failCount}
+          Success: {state.successCount}   Fail: {state.failCount}
         </Text>
         <Text style={styles.message}>
-          {time}
+          {state.time}
         </Text>
         <Button title="Cancel" onPress={stopTimer}/>
       </View>
@@ -76,7 +83,7 @@ const TwoMinute = () => {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
-          Success: {successCount}   Fail: {failCount}
+          Success: {state.successCount}   Fail: {state.failCount}
         </Text>
         <Text style={styles.message}>
           Done!
@@ -85,10 +92,7 @@ const TwoMinute = () => {
         <Button title="Fail" onPress={() => markSuccessFail(false)}/>
       </View> 
     )
-
   }
-  
- 
 }
 
 const styles = StyleSheet.create({
@@ -103,12 +107,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
     color: 'white'
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#B0B0B0',
-    marginBottom: 5,
-  },
+  }
 })
 
 
